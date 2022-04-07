@@ -1,0 +1,152 @@
+﻿@using Falcon.Web.Mvc.HtmlExtensions
+@model Phoenix.Server.Web.Areas.Admin.Models.Product.ProductModel
+@Html.ValidationSummary(true)
+@Html.HiddenFor(model => model.Id)
+<div class="grid grid-cols-12 gap-6 mt-5">
+    <div class="intro-y col-span-12 lg:col-span-6">
+        <div class="intro-y box p-5">
+
+            <div>
+                <label>Loại sản phẩm</label>
+                @*@Html.DropDownList("ProductType_Id", null, new { @class = "form-control input w-full border mt-2" })*@
+                <select id="selectProductType" name="ProductType_Id" class="tom-select"></select>
+                <script>
+                    var zsettings = {
+                        valueField: 'Id',
+                        labelField: 'Name',
+                        searchField: 'Name',
+                        placeholder: '-- Vui lòng chọn nhóm --',
+                        load: function (query, callback) {
+                            var url = '/api/dropdown/TakeAllProductTypes';
+                            fetch(url, { method: "post" })
+                                .then(response => response.json())
+                                .then(json => {
+                                    callback(json);
+                                }).catch(() => {
+                                    callback();
+                                });
+
+                        },
+                        render: {
+                            option: function (item, escape) {
+                                return `<option value="${item.Id}"> ${item.Name} </option>`;
+                            },
+                            item: function (item, escape) {
+                                return `<option value="${item.Id}"> ${item.Name} </option>`;
+                            }
+                        }
+                    };
+                    new TomSelect('#selectProductType', zsettings);
+                </script>
+            </div>
+
+            <div>
+                <label>Hãng sản xuất</label>
+                <select id="selectVendor" name="Vendor_Id" class="tom-select"></select>
+                <script>
+                    var zsettings = {
+                        valueField: 'Id',
+                        labelField: 'Name',
+                        searchField: 'Name',
+                        placeholder: '-- Vui lòng chọn nhóm --',
+                        @*if(@Model.Vendor_Id == null) {
+                            load: function (query, callback) {
+                                var url = '/api/dropdown/TakeAllVendors';
+                                fetch(url, { method: "post" })
+                                    .then(response => response.json())
+                                    .then(json => {
+                                        callback(json);
+                                    }).catch(() => {
+                                        callback();
+                                    });
+
+                            },
+                        }
+                        else {
+                            setValue(@Model.Vendor_Id),
+                        },*@
+                        load: function (query, callback) {
+                            var url = '/api/dropdown/TakeAllVendors';
+                            fetch(url, { method: "post" })
+                                .then(response => response.json())
+                                .then(json => {
+                                    callback(json);
+                                }).catch(() => {
+                                    callback();
+                                });
+
+                        },
+                        render: {
+                            option: function (item, escape) {
+                                return `<option value="${item.Id}"> ${item.Name} </option>`;
+                            },
+                            item: function (item, escape) {
+                                return `<option value="${item.Id}"> ${item.Name} </option>`;
+                            }
+                        }
+                    };
+                    var vendor_id = new TomSelect('#selectVendor', zsettings);
+                </script>
+                @if (Model.Id > 0)
+                {
+                    <option>
+                        vendor_id.setValue(@Model.Vendor_Id);
+                    </option>
+                }
+            </div>
+
+            <div>
+                <label>Tên sản phẩm</label>
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control input w-full border mt-2" } })
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+
+            <div>
+                <label>Model Code</label>
+                @Html.EditorFor(model => model.ModelCode, new { htmlAttributes = new { @class = "form-control input w-full border mt-2" } })
+                @Html.ValidationMessageFor(model => model.ModelCode)
+            </div>
+
+
+        </div>
+    </div>
+
+    @if (Model.Id > 0)
+    {
+        <div class="intro-y col-span-12 lg:col-span-6">
+            <div class="intro-y box p-5">
+                <div class="dropzone" id="dZUpload">
+                    <div class="fallback"> <input name="file" type="file" /> </div>
+                    <div class="dz-default dz-message" data-dz-message>
+                        <div class="text-lg font-medium">Drop files here or click to upload.</div>
+                        <div class="text-gray-600"> This is just a demo dropzone. Selected files are <span class="font-medium">not</span> actually uploaded.</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            Dropzone.autoDiscover = false;
+            //Simple Dropzonejs 
+            $("#dZUpload").dropzone({
+                url: "hn_SimpeFileUploader.ashx",
+                maxFiles: 5,
+                addRemoveLinks: true,
+                success: function (file, response) {
+                    var imgName = response;
+                    file.previewElement.classList.add("dz-success");
+                    console.log("Successfully uploaded :" + imgName);
+                },
+                error: function (file, response) {
+                    file.previewElement.classList.add("dz-error");
+                }
+            });
+        });
+    </script>
+
+}
